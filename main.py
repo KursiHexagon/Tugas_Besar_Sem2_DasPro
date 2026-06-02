@@ -1,6 +1,68 @@
+def Laporan():
+
+def MDKn():
+
+def MDPn():    
+
+def MDPi():
+
+def MDKr():
+    global kamar
+
+    while True:
+        choice = str(input("Apakah kamu ingin lihat list kamar sekarang? (Y/n): "))
+
+        if choice.upper() == "Y":
+            print("\n--- LIST KAMAR ---")
+            for data in kamar:
+                print(f"Nomor Kamar: {data['no']}, Status: {data['status']}")
+            print("-" * 18)
+        else:   
+            inputKamar = str(input("Apakah kamu ingin input kamar baru? (Y/n): "))
+            
+            while inputKamar.upper() == "Y":
+                while True:
+                    noKamar = int(input("Masukkan nomor kamar: "))
+                    
+                    if any(data['no'] == noKamar for data in kamar):
+                        print("No kamar sudah ada! Silakan masukkan nomor lain.")
+                    else:
+                        break 
+    
+                statusKamar = "Available"
+
+                newData = {"no": noKamar, "status": statusKamar}
+                kamar += [newData]
+
+                print("\n" + "=" * 6, "DATA KAMAR BERHASIL MASUK KE SISTEM", "=" * 6)
+                print(f"No Kamar - {noKamar}, status - {statusKamar}")
+
+                inputKamar = str(input("Apakah kamu ingin input kamar baru? (Y/n): "))
+            
+        finishChoice = input("Keluar dari input kamar sekarang? (Ketik 'Y' untuk keluar, atau Enter untuk lanjut) ")
+        if finishChoice.upper() == "Y" or finishChoice == "":
+            break
+        else:
+            continue                
+        
+
+def usrChoiceProc(uc):
+    if uc == 1:
+        MDKr()
+    elif uc == 2:
+        MDPi()
+    elif uc == 3:
+        MDPn()
+    elif uc == 4:
+        MDKn()
+    elif uc == 5:
+        Laporan()
+    else:
+        return
+
 
 def menu():
-    menuList = ["Data Kamar", "Data Penghuni", "Pembayaran", "Keluhan", "Laporan"]
+    menuList = ["Input Data Kamar", "Input Data Penghuni", "Input Pembayaran", "Input Keluhan", "Lihat Laporan"]
     
     for i in range(5):
         print((i+1), menuList[i])
@@ -28,9 +90,12 @@ def main():
             print("=" * 60)
             print("Maaf, namun menu yang tersedia hanyalah 1-5")
             usrChoice = int(input("Masukkan angka 1-5: "))
-        #usrChoiceProc(usrChoice)
+        
+        usrChoiceProc(usrChoice)
 
 
 
 if __name__ == '__main__':
     main()
+
+    kamar = []
