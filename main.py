@@ -133,7 +133,7 @@ def MDKr():
 
     while True:
         while True:
-            choice = str(input("Apakah kamu ingin lihat list kamar sekarang? (Y/n): ")).strip()
+            choice = str(input("Apakah kamu ingin lihat list kamar sekarang? (Y/n): "))
             if choice == "":
                 print("ERROR: Input tidak boleh kosong! Silakan masukkan 'Y' atau 'n'.")
             elif choice.upper() == "Y" or choice.upper() == "N":
@@ -152,7 +152,7 @@ def MDKr():
             print("================================================")
             
             while True:
-                finishChoice = input("Keluar dari input kamar sekarang?(Ketik 'Y' untuk keluar, atau Enter untuk lanjut): ").strip()
+                finishChoice = input("Keluar dari input kamar sekarang?(Ketik 'Y' untuk keluar, atau Enter untuk lanjut): ")
                 if finishChoice == "" or finishChoice.upper() == "Y":
                     break
                 else:
@@ -162,7 +162,7 @@ def MDKr():
                 break
             
         while True:
-            inputKamar = str(input("Apakah kamu ingin menambahkan kamar baru? (Y/n): ")).strip()
+            inputKamar = str(input("Apakah kamu ingin menambahkan kamar baru? (Y/n): "))
             
             # error handling 
             if inputKamar == "":
