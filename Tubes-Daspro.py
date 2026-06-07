@@ -53,7 +53,7 @@ idKeluhanPenghuni = [0] * MAX
 isiKeluhan = [""] * MAX
 
 jumlahKeluhan = 0
-
+totalPendapatan = 0
 
 # ==================================================
 # FUNCTION BANTU
@@ -105,6 +105,33 @@ def cariIndexPenghuni(idCari):
 
 
 # ==================================================
+# TAGIHAN BARU
+# ==================================================
+
+
+def generateTagihanBaru(idx):
+
+    nomor = kamarPenghuni[idx]
+
+    idxKamar = cariIndexKamar(nomor)
+
+    harga = hargaKamar[idxKamar]
+
+    isi = hitungIsiKamar(nomor)
+
+    if isi == 0:
+        isi = 1
+
+    if jenisSewa[idx] == "Bulanan":
+        tagihanPokok[idx] = harga // isi
+    else:
+        tagihanPokok[idx] = (harga * 12) // isi
+
+    nominalTerbayar[idx] = 0
+    dendaTagihan[idx] = 0
+
+
+# ==================================================
 # KELOLA KAMAR
 # ==================================================
 
@@ -121,6 +148,9 @@ def tambahKamar():
 
     harga = int(input("Harga kamar : "))
     kapasitas = int(input("Kapasitas kamar : "))
+    while kapasitas <= 0:
+        print("Kapasitas harus lebih dari 0")
+        kapasitas = int(input("Kapasitas kamar : "))
 
     noKamar[jumlahKamar] = no
     hargaKamar[jumlahKamar] = harga
@@ -205,6 +235,9 @@ def tambahPenghuni():
     pilih = int(input("Pilihan : "))
 
     bulan = int(input("Bulan masuk : "))
+    while bulan < 1 or bulan > 12:
+        print("Bulan harus 1 - 12")
+        bulan = int(input("Bulan masuk : "))
     tahun = int(input("Tahun masuk : "))
 
     if pilih == 1:
@@ -225,7 +258,21 @@ def tambahPenghuni():
 
         sewa = "Tahunan"
 
-    tagihan = hitungTagihanAwal(kamar)
+    idxKamar = cariIndexKamar(kamar)
+
+    harga = hargaKamar[idxKamar]
+
+    isi = hitungIsiKamar(kamar)
+
+    if isi == 0:
+        pembagi = 1
+    else:
+        pembagi = isi + 1
+
+    if pilih == 1:
+        tagihan = harga // pembagi
+    else:
+        tagihan = (harga * 12) // pembagi
 
     idPenghuni[jumlahPenghuni] = nextId
     namaPenghuni[jumlahPenghuni] = nama
@@ -316,6 +363,8 @@ def lihatTagihan():
 
 def pembayaran():
 
+    global totalPendapatan
+
     idCari = int(input("Masukkan ID Penghuni : "))
 
     idx = cariIndexPenghuni(idCari)
@@ -337,24 +386,26 @@ def pembayaran():
         dendaTagihan[idx] = 0
 
     totalTagihan = tagihanPokok[idx] + dendaTagihan[idx]
-    sisaTagihan = totalTagihan - nominalTerbayar[idx]
 
-    print(f"\nTotal Tagihan : Rp{totalTagihan}")
+    print(f"\nTagihan Pokok : Rp{tagihanPokok[idx]}")
+    print(f"Denda         : Rp{dendaTagihan[idx]}")
+    print(f"Total Tagihan : Rp{totalTagihan}")
     print(f"Sudah Dibayar : Rp{nominalTerbayar[idx]}")
-    print(f"Sisa Tagihan  : Rp{sisaTagihan}")
 
     bayar = int(input("Nominal pembayaran : "))
 
     nominalTerbayar[idx] += bayar
 
+    totalPendapatan += bayar
+
     if nominalTerbayar[idx] >= totalTagihan:
 
-        statusBayar[idx] = "Lunas"
+        kelebihan = nominalTerbayar[idx] - totalTagihan
 
         print("Pembayaran lunas.")
+        print(f"Kembalian : Rp{kelebihan}")
 
-        nominalTerbayar[idx] = 0
-        dendaTagihan[idx] = 0
+        statusBayar[idx] = "Lunas"
 
         if jenisSewa[idx] == "Bulanan":
 
@@ -368,15 +419,20 @@ def pembayaran():
 
             thnTempo[idx] += 1
 
+        generateTagihanBaru(idx)
+
+        statusBayar[idx] = "Belum Lunas"
+
     else:
 
         statusBayar[idx] = "Belum Lunas"
 
-        print("Pembayaran berhasil dicatat.")
+        sisa = totalTagihan - nominalTerbayar[idx]
 
-        # ==================================================
+        print(f"Sisa Tagihan : Rp{sisa}")
 
 
+# ==================================================
 # KELUHAN
 # ==================================================
 
@@ -421,9 +477,8 @@ def lihatKeluhan():
 
         i += 1
 
-        # ==================================================
 
-
+# ==================================================
 # CHECKOUT PENGHUNI
 # ==================================================
 
@@ -431,6 +486,7 @@ def lihatKeluhan():
 def checkoutPenghuni():
 
     global jumlahPenghuni
+    global jumlahKeluhan
 
     idCari = int(input("Masukkan ID Penghuni : "))
 
@@ -470,6 +526,26 @@ def checkoutPenghuni():
 
         i += 1
 
+    i = 0
+
+    while i < jumlahKeluhan:
+
+        if idKeluhanPenghuni[i] == idCari:
+
+            j = i
+
+            while j < jumlahKeluhan - 1:
+
+                idKeluhanPenghuni[j] = idKeluhanPenghuni[j + 1]
+                isiKeluhan[j] = isiKeluhan[j + 1]
+
+                j += 1
+
+            jumlahKeluhan -= 1
+
+        else:
+            i += 1
+
     jumlahPenghuni -= 1
 
     print("Checkout berhasil.")
@@ -507,16 +583,6 @@ def laporan():
             lunas += 1
         else:
             belumLunas += 1
-
-        i += 1
-
-    totalPendapatan = 0
-
-    i = 0
-
-    while i < jumlahPenghuni:
-
-        totalPendapatan += nominalTerbayar[i]
 
         i += 1
 
