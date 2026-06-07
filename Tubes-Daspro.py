@@ -1,3 +1,8 @@
+# Problems:
+# 1. Checkout: Tagihan selalu terupdate setelah penghuni melunasi tagihan. Sementara penghuni tidak bisa checkout sebelum tagihan lunas.
+# 2. Harga kos: Harga per tahun tetap menghitung (harga per tahun * 12)/jumlah penghuni.
+# Contoh: harga bulanan Rp1.000.000. Maka bila ada 2 orang penghuni, harga kos tahunan = (Rp12.000.000)/2 yaitu Rp6.000.000 (terlalu jauh dengan harga seharusnya).
+
 # File : Tubes_Daspro.py
 # Penulis : Deven Gerrard Kartamihardja; Silalahi, Lorenzo Julio Pardamean
 # Tujuan Program : Sistem Manajemen Kost
