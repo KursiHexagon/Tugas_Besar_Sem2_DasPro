@@ -24,7 +24,9 @@ bulanSekarang = tahunSekarang = 0
 
 noKamar = [0] * MAX
 hargaKamar = [0] * MAX
-kapasitasKamar = [0] * MAX
+
+jumlahTamu  = [0] * MAX
+hariTamu = [0] * MAX
 
 jumlahKamar = 0
 
@@ -128,15 +130,10 @@ def generateTagihanBaru(idx):
 
     harga = hargaKamar[idxKamar]
 
-    isi = hitungIsiKamar(nomor)
-
-    if isi == 0:
-        isi = 1
-
     if jenisSewa[idx] == "Bulanan":
-        tagihanPokok[idx] = harga // isi
+        tagihanPokok[idx] = harga
     else:
-        tagihanPokok[idx] = (harga * 12) // isi
+        tagihanPokok[idx] = harga * 12
 
     nominalTerbayar[idx] = 0
     dendaTagihan[idx] = 0
@@ -158,14 +155,9 @@ def tambahKamar():
         return
 
     harga = int(input("Harga kamar : "))
-    kapasitas = int(input("Kapasitas kamar : "))
-    while kapasitas <= 0:
-        print("Kapasitas harus lebih dari 0")
-        kapasitas = int(input("Kapasitas kamar : "))
 
     noKamar[jumlahKamar] = no
     hargaKamar[jumlahKamar] = harga
-    kapasitasKamar[jumlahKamar] = kapasitas
 
     jumlahKamar += 1
 
@@ -188,31 +180,10 @@ def lihatKamar():
 
         print(f"Nomor Kamar : {noKamar[i]}")
         print(f"Harga       : Rp{hargaKamar[i]}")
-        print(f"Kapasitas   : {kapasitasKamar[i]}")
         print(f"Terisi      : {isi}")
         print("-------------------------")
 
         i += 1
-
-
-# ==================================================
-# GENERATE TAGIHAN
-# ==================================================
-
-
-def hitungTagihanAwal(no):
-
-    idx = cariIndexKamar(no)
-
-    harga = hargaKamar[idx]
-
-    isi = hitungIsiKamar(no)
-
-    if isi == 0:
-        return harga
-
-    return harga // (isi + 1)
-
 
 # ==================================================
 # KELOLA PENGHUNI
@@ -234,10 +205,8 @@ def tambahPenghuni():
         print("Kamar tidak ditemukan.")
         return
 
-    isi = hitungIsiKamar(kamar)
-
-    if isi >= kapasitasKamar[idxKamar]:
-        print("Kamar sudah penuh.")
+    if hitungIsiKamar(kamar) >= 1:
+        print("Kamar sudah ditempati.")
         return
 
     print("1. Bulanan")
@@ -273,17 +242,10 @@ def tambahPenghuni():
 
     harga = hargaKamar[idxKamar]
 
-    isi = hitungIsiKamar(kamar)
-
-    if isi == 0:
-        pembagi = 1
-    else:
-        pembagi = isi + 1
-
     if pilih == 1:
-        tagihan = harga // pembagi
+        tagihan = harga
     else:
-        tagihan = (harga * 12) // pembagi
+        tagihan = harga * 12
 
     idPenghuni[jumlahPenghuni] = nextId
     namaPenghuni[jumlahPenghuni] = nama
@@ -341,7 +303,6 @@ def lihatPenghuni():
 # LIHAT TAGIHAN
 # ==================================================
 
-
 def lihatTagihan():
 
     idCari = int(input("Masukkan ID Penghuni : "))
@@ -352,18 +313,21 @@ def lihatTagihan():
         print("ID tidak ditemukan.")
         return
 
-    totalTagihan = tagihanPokok[idx] + dendaTagihan[idx]
+    biayaTamu = jumlahTamu[idx] * hariTamu[idx] * 50000
+    totalTagihan = tagihanPokok[idx] + dendaTagihan[idx] + biayaTamu
     sisaTagihan = totalTagihan - nominalTerbayar[idx]
 
     print("\n===== TAGIHAN =====")
     print(f"ID            : {idPenghuni[idx]}")
     print(f"Nama          : {namaPenghuni[idx]}")
     print(f"Tagihan Pokok : Rp{tagihanPokok[idx]}")
+    print(f"Biaya Tamu    : Rp{biayaTamu}")
     print(f"Denda         : Rp{dendaTagihan[idx]}")
     print(f"Total Tagihan : Rp{totalTagihan}")
     print(f"Sudah Bayar   : Rp{nominalTerbayar[idx]}")
     print(f"Sisa Tagihan  : Rp{sisaTagihan}")
     print(f"Status        : {statusBayar[idx]}")
+
 
 # ==================================================
 # UBAH TANGGAL
@@ -410,8 +374,11 @@ def pembayaran():
         dendaTagihan[idx] = 0
 
     totalTagihan = tagihanPokok[idx] + dendaTagihan[idx]
+    biayaTamu = jumlahTamu[idx] * hariTamu[idx] * 50000
+    totalTagihan = tagihanPokok[idx] + dendaTagihan[idx] + biayaTamu
 
     print(f"\nTagihan Pokok : Rp{tagihanPokok[idx]}")
+    print(f"Biaya Tamu    : Rp{biayaTamu}")
     print(f"Denda         : Rp{dendaTagihan[idx]}")
     print(f"Total Tagihan : Rp{totalTagihan}")
     print(f"Sudah Dibayar : Rp{nominalTerbayar[idx]}")
@@ -420,41 +387,32 @@ def pembayaran():
 
     nominalTerbayar[idx] += bayar
 
-    totalPendapatan += bayar
-
     if nominalTerbayar[idx] >= totalTagihan:
-
+        totalPendapatan += totalTagihan
+        jumlahTamu[idx] = 0
+        hariTamu[idx] = 0
         kelebihan = nominalTerbayar[idx] - totalTagihan
 
         print("Pembayaran lunas.")
         print(f"Kembalian : Rp{kelebihan}")
-
         statusBayar[idx] = "Lunas"
 
         if jenisSewa[idx] == "Bulanan":
-
             blnTempo[idx] += 1
-
             if blnTempo[idx] > 12:
                 blnTempo[idx] = 1
                 thnTempo[idx] += 1
-
         else:
-
             thnTempo[idx] += 1
-
         generateTagihanBaru(idx)
-
+        print("Tagihan periode berikutnya telah dibuat.")
         statusBayar[idx] = "Belum Lunas"
 
     else:
-
+        totalPendapatan += bayar
         statusBayar[idx] = "Belum Lunas"
-
         sisa = totalTagihan - nominalTerbayar[idx]
-
         print(f"Sisa Tagihan : Rp{sisa}")
-
 
 # ==================================================
 # KELUHAN
@@ -506,7 +464,6 @@ def lihatKeluhan():
 # CHECKOUT PENGHUNI
 # ==================================================
 
-
 def checkoutPenghuni():
 
     global jumlahPenghuni
@@ -520,8 +477,10 @@ def checkoutPenghuni():
         print("ID tidak ditemukan.")
         return
 
-    if statusBayar[idx] != "Lunas":
-        print("Penghuni masih memiliki tunggakan.")
+    biayaTamu = jumlahTamu[idx] * hariTamu[idx] * 50000
+    totalTagihan = tagihanPokok[idx] + dendaTagihan[idx] + biayaTamu
+    if nominalTerbayar[idx] < totalTagihan:
+        print("Tagihan belum lunas.")
         return
 
     i = idx
@@ -573,7 +532,6 @@ def checkoutPenghuni():
     jumlahPenghuni -= 1
 
     print("Checkout berhasil.")
-
 
 # ==================================================
 # LAPORAN
