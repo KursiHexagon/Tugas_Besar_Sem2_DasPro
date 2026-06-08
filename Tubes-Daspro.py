@@ -13,6 +13,12 @@
 MAX = 100
 
 # =========================
+# BULAN DAN TAHUN SEKARANG
+# =========================
+bulanSekarang = tahunSekarang = 0
+
+
+# =========================
 # DATA KAMAR
 # =========================
 
@@ -359,12 +365,28 @@ def lihatTagihan():
     print(f"Sisa Tagihan  : Rp{sisaTagihan}")
     print(f"Status        : {statusBayar[idx]}")
 
-    # ==================================================
-
-
-# PEMBAYARAN
+# ==================================================
+# UBAH TANGGAL
 # ==================================================
 
+def ubahTanggal():
+    global bulanSekarang, tahunSekarang
+
+    bulan = int(input("Bulan sekarang : "))
+    while bulan < 1 or bulan > 12:
+        print("Bulan harus 1 - 12")
+        bulan = int(input("Bulan sekarang : "))
+
+    tahun = int(input("Tahun sekarang : "))
+
+    bulanSekarang = bulan
+    tahunSekarang = tahun
+
+    print(f"Tanggal diperbarui : {bulanSekarang}/{tahunSekarang}")
+
+# ==================================================
+# PEMBAYARAN
+# ==================================================
 
 def pembayaran():
 
@@ -377,9 +399,6 @@ def pembayaran():
     if idx == -1:
         print("ID tidak ditemukan.")
         return
-
-    bulanSekarang = int(input("Bulan sekarang : "))
-    tahunSekarang = int(input("Tahun sekarang : "))
 
     selisihBulan = ((tahunSekarang - thnTempo[idx]) * 12) + (
         bulanSekarang - blnTempo[idx]
@@ -555,9 +574,8 @@ def checkoutPenghuni():
 
     print("Checkout berhasil.")
 
-    # ==================================================
 
-
+# ==================================================
 # LAPORAN
 # ==================================================
 
@@ -631,6 +649,8 @@ def menu():
 
     print("10. Laporan")
 
+    print("11. Ubah Tanggal")
+
     print("0. Keluar")
 
 
@@ -640,6 +660,15 @@ def menu():
 
 
 def main():
+
+    global bulanSekarang, tahunSekarang
+
+    bulanSekarang = int(input("Bulan sekarang : "))
+    while bulanSekarang < 1 or bulanSekarang > 12:
+        print("Bulan harus 1 - 12")
+        bulanSekarang = int(input("Bulan sekarang : "))
+    tahunSekarang = int(input("Tahun sekarang : "))
+
 
     pilihan = -1
 
@@ -678,6 +707,9 @@ def main():
 
         elif pilihan == 10:
             laporan()
+
+        elif pilihan == 11:
+            ubahTanggal()
 
         elif pilihan == 0:
             print("Program selesai.")
