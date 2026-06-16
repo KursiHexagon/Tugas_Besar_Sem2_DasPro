@@ -50,6 +50,7 @@ nextId = 1
 # =========================
 idKeluhanPenghuni = [0] * MAX
 isiKeluhan = [""] * MAX
+statusKeluhan = [""] * MAX 
 jumlahKeluhan = 0
 totalPendapatan = 0
 
@@ -490,6 +491,7 @@ def inputKeluhan():
     keluhan = input("Keluhan : ")
     idKeluhanPenghuni[jumlahKeluhan] = idCari
     isiKeluhan[jumlahKeluhan] = keluhan
+    statusKeluhan[jumlahKeluhan] = "Belum Selesai"   
     jumlahKeluhan += 1
     print("Keluhan dicatat.")
 
@@ -501,10 +503,34 @@ def lihatKeluhan():
     i = 0
     while i < jumlahKeluhan:
         print(
-            f"ID Penghuni : {idKeluhanPenghuni[i]}\nKeluhan     : {isiKeluhan[i]}\n----------------------"
+            f"ID Penghuni : {idKeluhanPenghuni[i]}\nKeluhan     : {isiKeluhan[i]}\nStatus      : {statusKeluhan[i]}\n----------------------"
         )
         i += 1
 
+def updateStatusKeluhan():
+    if jumlahKeluhan == 0:
+        print("Belum ada keluhan.")
+        return
+
+    noKeluhan = int(input("Nomor keluhan yang ingin diupdate (lihat daftar keluhan): "))
+    if noKeluhan < 1 or noKeluhan > jumlahKeluhan:
+        print("Nomor keluhan tidak valid.")
+        return
+
+    idx = noKeluhan - 1
+    print(f"Keluhan     : {isiKeluhan[idx]}")
+    print(f"Status saat ini: {statusKeluhan[idx]}")
+
+    if statusKeluhan[idx] == "Selesai":
+        print("Keluhan ini sudah ditandai selesai.")
+        return
+
+    konfirmasi = input("Tandai sebagai selesai? (y/n): ")
+    if konfirmasi == "y":
+        statusKeluhan[idx] = "Selesai"
+        print("Status keluhan berhasil diperbarui.")
+    else:
+        print("Tidak ada perubahan.")
 
 def laporan():
     kamarTerisi = 0
@@ -547,8 +573,9 @@ def menu():
     print("3.\tTambah Penghuni\t\t4.\tLihat Penghuni")
     print("5.\tKelola Tamu Menginap\t6.\tLihat Tagihan Real-time")
     print("7.\tPembayaran\t\t8.\tCheckout Penghuni")
-    print("9.\tInput Keluhan\t\t10.\tLihat Keluhan")
-    print("11.\tLaporan Keuangan\t12.\tUbah Tanggal (Simulasi)")
+    print("9.\tInput Keluhan\t\t10.\tUpdate Status Keluhan")
+    print("11.\tLihat Keluhan\t\t12.\tLaporan keuangan")
+    print("13.\tUbah Tanggal (Simulasi)")
     print("0.\tKeluar")
 
 
@@ -584,10 +611,12 @@ def main():
         elif pilihan == 9:
             inputKeluhan()
         elif pilihan == 10:
-            lihatKeluhan()
+            updateStatusKeluhan()
         elif pilihan == 11:
-            laporan()
+            lihatKeluhan()
         elif pilihan == 12:
+            laporan()
+        elif pilihan == 13:
             ubahTanggal()
         elif pilihan == 0:
             print("Program keluar.")
