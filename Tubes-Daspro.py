@@ -276,12 +276,12 @@ def kelolaTamu():
 
     print(f"Penghuni Kamar: {namaPenghuni[idx]} (Kamar {kamarPenghuni[idx]})")
     tamu = int(input("Jumlah tamu baru yang menginap : "))
-    while tamu < 0:
+    while tamu <= 0:
         print("Jumlah tamu tidak boleh negatif")
         tamu = int(input("Jumlah tamu baru yang menginap : "))
 
     hari = int(input("Berapa hari menginap           : "))
-    while hari < 0:
+    while hari <= 0:
         print("Jumlah hari tidak boleh negatif")
         hari = int(input("Berapa hari menginap : "))
 
