@@ -1,6 +1,6 @@
 # File : Tubes_Daspro.py
 # Penulis : Deven Gerrard Kartamihardja; Silalahi, Lorenzo Julio Pardamean
-# Pembaruan: Menambah fitur tagihan tamu berbasis harian (Rp50.000 per hari) dan memperbaiki fitur checkout
+# Pembaruan: Menambahkan DP 50% terlebih dahulu sebelum bisa menghuni
 
 MAX = 100
 
@@ -50,7 +50,7 @@ nextId = 1
 # =========================
 idKeluhanPenghuni = [0] * MAX
 isiKeluhan = [""] * MAX
-statusKeluhan = [""] * MAX 
+statusKeluhan = [""] * MAX
 jumlahKeluhan = 0
 totalPendapatan = 0
 
@@ -157,7 +157,7 @@ def lihatKamar():
 
 
 def tambahPenghuni():
-    global jumlahPenghuni, nextId
+    global jumlahPenghuni, nextId, totalPendapatan
 
     nama = input("Nama penghuni : ")
     kamar = int(input("Nomor kamar : "))
@@ -200,6 +200,20 @@ def tambahPenghuni():
         sewa = "Tahunan"
         tagihan = hargaKamarTahunan[idxKamar]
 
+    minimalDP = tagihan // 2
+
+    print(f"Tagihan Pokok : Rp{tagihan}")
+    print(f"Minimal DP (50%) : Rp{minimalDP}")
+
+    dp = int(input("Masukkan nominal DP : Rp"))
+
+    while dp < minimalDP or dp > tagihan:
+        if dp < minimalDP:
+            print("DP tidak boleh kurang dari 50% tagihan!")
+        else:
+            print("DP tidak boleh melebihi total tagihan!")
+        dp = int(input("Masukkan nominal DP : Rp"))
+
     idPenghuni[jumlahPenghuni] = nextId
     namaPenghuni[jumlahPenghuni] = nama
     kamarPenghuni[jumlahPenghuni] = kamar
@@ -213,12 +227,19 @@ def tambahPenghuni():
 
     tagihanPokok[jumlahPenghuni] = tagihan
     dendaTagihan[jumlahPenghuni] = 0
-    nominalTerbayar[jumlahPenghuni] = 0
-    statusBayar[jumlahPenghuni] = "Belum Lunas"
+    nominalTerbayar[jumlahPenghuni] = dp
+    if dp == tagihan:
+        statusBayar[jumlahPenghuni] = "Lunas"
+    else:
+        statusBayar[jumlahPenghuni] = "Belum Lunas"
+    totalPendapatan += dp
 
     print("\n===== DATA PENGHUNI =====")
-    print(f"ID Penghuni : {nextId}\nNama        : {nama}\nTagihan     : Rp{tagihan}")
-
+    print(f"ID Penghuni : {nextId}")
+    print(f"Nama        : {nama}")
+    print(f"Tagihan     : Rp{tagihan}")
+    print(f"DP Dibayar  : Rp{dp}")
+    print(f"Sisa Bayar  : Rp{tagihan - dp}")
     jumlahPenghuni += 1
     nextId += 1
 
@@ -255,7 +276,14 @@ def kelolaTamu():
 
     print(f"Penghuni Kamar: {namaPenghuni[idx]} (Kamar {kamarPenghuni[idx]})")
     tamu = int(input("Jumlah tamu baru yang menginap : "))
+    while tamu < 0:
+        print("Jumlah tamu tidak boleh negatif")
+        tamu = int(input("Jumlah tamu baru yang menginap : "))
+
     hari = int(input("Berapa hari menginap           : "))
+    while hari < 0:
+        print("Jumlah hari tidak boleh negatif")
+        hari = int(input("Berapa hari menginap : "))
 
     # Kalkulasi biaya per kedatangan secara instan agar tidak terjadi perkalian silang salah
     biayaKedatanganSkg = tamu * hari * 50000
@@ -400,12 +428,19 @@ def pembayaran():
     print(f"Denda (Hari)  : Rp{dendaTagihan[idx]}")
     print(f"Total Tagihan : Rp{totalTagihan}")
     print(f"Sudah Dibayar : Rp{nominalTerbayar[idx]}")
+    sisaTagihan = totalTagihan - nominalTerbayar[idx]
+    if sisaTagihan < 0:
+        sisaTagihan = 0
+    print(f"Sisa Tagihan  : Rp{sisaTagihan}")
 
     if statusBayar[idx] == "Lunas":
         print("Tagihan periode ini sudah lunas!")
         return
 
     bayar = int(input("Nominal pembayaran : "))
+    while bayar <= 0:
+        print("Nominal pembayaran harus lebih dari 0")
+        bayar = int(input("Nominal pembayaran : "))
     nominalTerbayar[idx] += bayar
 
     if nominalTerbayar[idx] >= totalTagihan:
@@ -491,7 +526,7 @@ def inputKeluhan():
     keluhan = input("Keluhan : ")
     idKeluhanPenghuni[jumlahKeluhan] = idCari
     isiKeluhan[jumlahKeluhan] = keluhan
-    statusKeluhan[jumlahKeluhan] = "Belum Selesai"   
+    statusKeluhan[jumlahKeluhan] = "Belum Selesai"
     jumlahKeluhan += 1
     print("Keluhan dicatat.")
 
@@ -506,6 +541,7 @@ def lihatKeluhan():
             f"ID Penghuni : {idKeluhanPenghuni[i]}\nKeluhan     : {isiKeluhan[i]}\nStatus      : {statusKeluhan[i]}\n----------------------"
         )
         i += 1
+
 
 def updateStatusKeluhan():
     if jumlahKeluhan == 0:
@@ -531,6 +567,7 @@ def updateStatusKeluhan():
         print("Status keluhan berhasil diperbarui.")
     else:
         print("Tidak ada perubahan.")
+
 
 def laporan():
     kamarTerisi = 0
